@@ -8,7 +8,7 @@
 from scrapy import signals
 
 
-class DailyNewsScraperSpiderMiddleware(object):
+class NewsCrawlerSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
     # passed objects.
@@ -56,7 +56,7 @@ class DailyNewsScraperSpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
-class DailyNewsScraperDownloaderMiddleware(object):
+class NewsCrawlerDownloaderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.

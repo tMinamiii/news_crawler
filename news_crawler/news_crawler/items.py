@@ -8,7 +8,8 @@
 import scrapy
 
 
-class DailyNewsScraperItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class NewsCrawlerItem(scrapy.Item):
+    category = scrapy.Field()
+    title = scrapy.Field()
+    manuscript_len = scrapy.Field()
+    manuscript = scrapy.Field()

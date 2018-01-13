@@ -1,0 +1,95 @@
+import scrapy
+import datetime
+from news_crawler.items import NewsCrawlerItem
+
+
+class YahooNewsSpider(scrapy.Spider):
+    name = "yahoonews"
+    # allowed_domains = ['*.yahoo.co.jp']
+    start_urls = ['https://headlines.yahoo.co.jp/rss/list']
+    scraped_url = set()
+    now = datetime.datetime.now()
+    oneline = True
+
+    def parse(self, response):
+        news_areas = response.css('div.rss_listbox')
+        for area in news_areas:
+            if area.css('h3[id=news]'):
+                titles = area.css('div.ymuiHeaderBGLight > h4.ymuiTitle')
+                containers = area.css('div.ymuiContainer')
+                break
+        for t_ml, con in zip(titles, containers):
+            # title = t_ml.css('::text').extract_first()
+            links = con.css('ul.ymuiList > li.ymuiArrow > dl')
+            for link in links:
+                # name = link.css('dt::text').extract_first()
+                url = link.css('dd > a::attr(href)').extract_first()
+                if url not in self.scraped_url:
+                    self.scraped_url.add(url)
+                    yield scrapy.Request(
+                        response.urljoin(url), callback=self.parse_rss_xml)
+
+    def parse_rss_xml(self, response):
+        items = response.css('item')
+        for item in items:
+            pubdate_str = item.css('pubDate::text').extract_first()
+            if self.is_old_news(pubdate_str, self.now) is True:
+                # rssなのでbreakでもよいが念の為
+                continue
+            title = item.css('title::text').extract_first().strip()
+            link = item.css('link::text').extract_first()
+            category = item.css('category::text').extract_first()
+            yield scrapy.Request(
+                response.urljoin(link),
+                callback=self.parse_manuscript,
+                meta={'category': category,
+                      'title': title})
+            # カテゴリごとに保存ディレクトリを分けるので
+            # categoryをkeyにして辞書で返す
+
+    def parse_manuscript(self, response):
+        # readしてHTMLデータをすべてDLしてしまう
+
+        # code = response.status
+        # headers = response.headers
+        # self.logger.debug("(parse_page) response: status=%d, URL=%s"
+        #                   % (response.status, response.url))
+        '''
+        if code in (302,) and 'Location' in headers:
+            self.logger.debug("(parse_page) Location header: %r"
+                              % response.headers['Location'])
+            yield scrapy.Request(response.urljoin(headers['Location']),
+                                 callback=self.parse_manuscript)
+        '''
+        paragraphs = response.css('div.paragraph')
+        manuscript = ''
+        for para in paragraphs:
+            try:
+                heading = para.css(
+                    'div.ynDetailHeading > em::text').extract_first()
+                if heading is not None:
+                    manuscript += heading.strip()
+                detail_text = para.css('p.ynDetailText::text')
+                for text in detail_text:
+                    manuscript += text.extract().strip()
+            except Exception:
+                print('+++++++Error occoured while scraping : ' + response.url)
+
+        if self.oneline:
+            manuscript = manuscript.replace('\r', '')
+            manuscript = manuscript.replace('\n', '')
+        item = NewsCrawlerItem()
+        item['manuscript'] = manuscript
+        item['manuscript_len'] = len(manuscript)
+        item['category'] = response.meta.get('category')
+        item['title'] = response.meta.get('title')
+        yield item
+
+    def is_old_news(self, pubdate_str: str, specified_date: datetime) -> bool:
+        if specified_date is None:
+            return False
+        date_format = '%a, %d %b %Y %H:%M:%S %z'
+        pubdate = datetime.datetime.strptime(pubdate_str, date_format)
+        # 指定した日付より後のニュースは最新ニュースとして扱う
+        # 指定した日付よりも前のニュースは古いのでTrue
+        return pubdate.date() < specified_date.date()
