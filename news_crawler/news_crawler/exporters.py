@@ -34,7 +34,7 @@ class FTPFeedStorage(feedexport.BlockingFeedStorage):
         ftp.quit()
 
 
-class SpiderSlot(object):
+class MySpiderSlot(object):
     def __init__(self, file, exporter, storage, uri, exporting):
         self.file = file
         self.exporter = exporter
@@ -59,7 +59,6 @@ class FeedExporter(feedexport.FeedExporter):
         pass
 
     def close_spider(self, spider):
-        slot = self.slot
         uri_list = set()
         total_itemcount = 0
         for _, slot in self.slot_cache.items():
@@ -95,7 +94,7 @@ class FeedExporter(feedexport.FeedExporter):
                                           fields_to_export=self.export_fields,
                                           encoding=self.export_encoding,
                                           indent=self.indent)
-            self.slot_cache[category] = SpiderSlot(
+            self.slot_cache[category] = MySpiderSlot(
                 file, exporter, storage, uri, False)
 
         slot = self.slot_cache[category]
