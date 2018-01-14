@@ -1,0 +1,10 @@
+[Unit]
+Description = Scrapyd
+
+[Service]
+ExecStart = /home/pi/.pyenv/shims/scrapyd
+Restart=always
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
