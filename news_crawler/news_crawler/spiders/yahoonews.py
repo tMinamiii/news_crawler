@@ -1,6 +1,11 @@
-import scrapy
 import datetime
+import logging
+
+import scrapy
+
 from news_crawler.items import NewsCrawlerItem
+
+logger = logging.getLogger(__name__)
 
 
 class YahooNewsSpider(scrapy.Spider):
@@ -8,7 +13,7 @@ class YahooNewsSpider(scrapy.Spider):
     # allowed_domains = ['*.yahoo.co.jp']
     start_urls = ['https://headlines.yahoo.co.jp/rss/list']
     scraped_url = set()
-    now = datetime.datetime.now()
+    starttime = datetime.datetime.now()
     oneline = True
 
     def parse(self, response):
@@ -33,7 +38,7 @@ class YahooNewsSpider(scrapy.Spider):
         items = response.css('item')
         for item in items:
             pubdate_str = item.css('pubDate::text').extract_first()
-            if self.is_old_news(pubdate_str, self.now) is True:
+            if self.is_old_news(pubdate_str, self.starttime) is True:
                 # rssなのでbreakでもよいが念の為
                 continue
             title = item.css('title::text').extract_first().strip()
@@ -44,23 +49,9 @@ class YahooNewsSpider(scrapy.Spider):
                 callback=self.parse_manuscript,
                 meta={'category': category,
                       'title': title})
-            # カテゴリごとに保存ディレクトリを分けるので
-            # categoryをkeyにして辞書で返す
 
     def parse_manuscript(self, response):
-        # readしてHTMLデータをすべてDLしてしまう
 
-        # code = response.status
-        # headers = response.headers
-        # self.logger.debug("(parse_page) response: status=%d, URL=%s"
-        #                   % (response.status, response.url))
-        '''
-        if code in (302,) and 'Location' in headers:
-            self.logger.debug("(parse_page) Location header: %r"
-                              % response.headers['Location'])
-            yield scrapy.Request(response.urljoin(headers['Location']),
-                                 callback=self.parse_manuscript)
-        '''
         paragraphs = response.css('div.paragraph')
         manuscript = ''
         for para in paragraphs:
@@ -73,7 +64,7 @@ class YahooNewsSpider(scrapy.Spider):
                 for text in detail_text:
                     manuscript += text.extract().strip()
             except Exception:
-                print('+++++++Error occoured while scraping : ' + response.url)
+                logger.warn('Error occoured while scraping : ' + response.url)
 
         if self.oneline:
             manuscript = manuscript.replace('\r', '')
