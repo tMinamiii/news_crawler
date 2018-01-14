@@ -88,7 +88,7 @@ DOWNLOAD_DELAY = 1
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-FEED_URI = 'ftp://crawlerpy:crawlerpy@olive.local/Crawler/%(category)s/%(category)-%(starttime).csv'
+FEED_URI = 'ftp://crawlerpy:crawlerpy@olive.local/Crawler/YahooNews/%(category)s/%(category)s-%(starttime)s.csv'
 
 EXTENSIONS_BASE = {
     'scrapy.extensions.corestats.CoreStats': 0,
