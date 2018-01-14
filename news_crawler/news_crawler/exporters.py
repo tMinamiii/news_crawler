@@ -84,9 +84,9 @@ class FeedExporter(feedexport.FeedExporter):
     def item_scraped(self, item, spider):
         category = item['category']
         if category not in self.slot_cache:
-
+            timestr = spider.starttime.strftime('%Y-%m-%d')
             uri = self.urifmt % {'category': category,
-                                 'starttime': spider.starttime}
+                                 'starttime': timestr}
 
             storage = self._get_storage(uri)
             file = storage.open(spider)
