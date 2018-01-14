@@ -1,5 +1,6 @@
 **/__pycache__/
 **/*.ipynb
+**/*.scrapy
 env
 GPATH
 GTAGS
