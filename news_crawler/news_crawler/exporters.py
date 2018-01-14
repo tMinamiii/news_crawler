@@ -45,7 +45,7 @@ class SpiderSlot(object):
 
 
 def store_all_slots(slots):
-    for category, slot in slots.items():
+    for _, slot in slots.items():
         slot.storage.store(slot.file)
 
 
@@ -54,28 +54,6 @@ class FeedExporter(feedexport.FeedExporter):
     def __init__(self, settings):
         super().__init__(settings)
         self.slot_cache = {}
-        '''
-        self.settings = settings
-        self.urifmt = settings['FEED_URI']
-        if not self.urifmt:
-            raise NotConfigured
-        self.format = settings['FEED_FORMAT'].lower()
-        self.export_encoding = settings['FEED_EXPORT_ENCODING']
-        self.storages = self._load_components('FEED_STORAGES')
-        self.exporters = self._load_components('FEED_EXPORTERS')
-        if not self._storage_supported(self.urifmt):
-            raise NotConfigured
-        if not self._exporter_supported(self.format):
-            raise NotConfigured
-        self.store_empty = settings.getbool('FEED_STORE_EMPTY')
-        self._exporting = False
-        self.export_fields = settings.getlist('FEED_EXPORT_FIELDS') or None
-        self.indent = None
-        if settings.get('FEED_EXPORT_INDENT') is not None:
-            self.indent = settings.getint('FEED_EXPORT_INDENT')
-        uripar = settings['FEED_URI_PARAMS']
-        self._uripar = load_object(uripar) if uripar else lambda x, y: None
-        '''
 
     def open_spider(self, spider):
         pass
@@ -84,10 +62,10 @@ class FeedExporter(feedexport.FeedExporter):
         slot = self.slot
         uri_list = set()
         total_itemcount = 0
-        for slot in self.slot_cache.items():
+        for _, slot in self.slot_cache.items():
             if not slot.itemcount and not self.store_empty:
                 return
-            if self._exporting:
+            if slot.exporting:
                 slot.exporter.finish_exporting()
                 slot.exporting = False
             total_itemcount += slot.itemcount
@@ -117,14 +95,14 @@ class FeedExporter(feedexport.FeedExporter):
                                           fields_to_export=self.export_fields,
                                           encoding=self.export_encoding,
                                           indent=self.indent)
-            if self.store_empty:
-                exporter.start_exporting()
-                self._exporting = True
-
             self.slot_cache[category] = SpiderSlot(
                 file, exporter, storage, uri, False)
 
         slot = self.slot_cache[category]
+        if self.store_empty:
+                exporter.start_exporting()
+                slot.exporting = True
+
         if not slot.exporting:
             slot.exporter.start_exporting()
             slot.exporting = True
