@@ -2,7 +2,7 @@
 Description = Scrapyd
 
 [Service]
-ExecStart = /home/pi/.pyenv/shims/scrapyd
+ExecStart = /usr/loca/bin/scrapyd
 Restart=always
 Type=simple
 
