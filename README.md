@@ -10,7 +10,7 @@ Raspberry Pi 3 Model B上でscrapy + scrapyd を使用してYahooニュースを
 
 ## 自宅環境
 
-- FTP server address : 172.16.27.200
+- FTP server address : 172.16.27.200/Crawler/YahooNews
     - ニュースの置き場
 - Port : 46800
 
