@@ -10,7 +10,7 @@ Raspberry Pi 3 Model B上でscrapy + scrapyd を使用してYahooニュースを
 
 ## 自宅環境
 
-- FTP server address : olive.local
+- FTP server address : 172.16.27.200
     - ニュースの置き場
 - Port : 46800
 
