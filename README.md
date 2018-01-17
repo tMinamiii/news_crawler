@@ -8,11 +8,11 @@ Raspberry Pi 3 Model B上でscrapy + scrapyd を使用してYahooニュースを
 - CPU: ARMv8 1.2GHz Quad Core
 - Memory: 1G Byte
 
+## 自宅環境
 
-- FTP server address : olive.local (ローカル環境)
-- IP address : 0.0.0.0
+- FTP server address : olive.local
+    - ニュースの置き場
 - Port : 46800
-
 
 ## 概要
 
@@ -28,7 +28,7 @@ Raspberry Pi 3 Model B上でscrapy + scrapyd を使用してYahooニュースを
 ### settings.py
 
 `FEED_URI`を変更することで別の環境でも動作すると思います(未検証)
-
+(デフォルトのFEED_URIは自宅のFTPサーバーになっています。)
 
 ### news_crawler/scrapy.cfg,
 
