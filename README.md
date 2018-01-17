@@ -1,6 +1,18 @@
 # daily_news_scraper
 
-scrapy + scrapyd を使用してYahooニュースをクローリングします。
+Raspberry Pi 3 Model B上でscrapy + scrapyd を使用してYahooニュースをクローリングします。
+
+## 動作環境
+
+- OS: Raspbian (Debian系)
+- CPU: ARMv8 1.2GHz Quad Core
+- Memory: 1G Byte
+
+
+- FTP server address : olive.local (ローカル環境)
+- IP address : 0.0.0.0
+- Port : 46800
+
 
 ## 概要
 

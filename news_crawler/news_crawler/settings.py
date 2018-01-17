@@ -35,7 +35,7 @@ HTTPCACHE_EXPIRATION_SECS = 7200
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 LOG_LEVEL = 'INFO'
-FEED_URI = 'ftp://crawlerpy:crawlerpy@olive.local/Crawler/YahooNews/%(category)s/%(category)s_%(starttime)s.csv'
+FEED_URI = 'ftp://crawlerpy:crawlerpy@172.16.27.200/Crawler/YahooNews/%(category)s/%(category)s_%(starttime)s.csv'
 
 EXTENSIONS_BASE = {
     'scrapy.extensions.corestats.CoreStats': 0,
