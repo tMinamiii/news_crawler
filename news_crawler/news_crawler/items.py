@@ -9,11 +9,11 @@ import scrapy
 
 
 class AllNewsItems(scrapy.Item):
-    token_items = None
-    original_news_items = None
+    token_items = scrapy.Field()
+    original_news_items = scrapy.Field()
 
 
-class TokenItem(scrapy.Item):
+class TokenItems(scrapy.Item):
     tokens = scrapy.Field()
 
 

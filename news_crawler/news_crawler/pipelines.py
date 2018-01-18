@@ -9,13 +9,12 @@ import re
 import MeCab
 
 import mojimoji
-import settings
 from news_crawler.items import TokenItems
 
 
 class YahooNewsTokenizer:
-    def __init__(self):
-        self._m = MeCab.Tagger(settings.MECAB_DICTIONARY)
+    def __init__(self, dictionary):
+        self._m = MeCab.Tagger(dictionary)
         # compileしておく
         self.eng_sentences = re.compile(r'[a-zA-Z0-9]+[ ,\.\'\:\;\-\+?\!]')
         self.numbers = re.compile(r'[0-9０-９]+')
@@ -70,11 +69,12 @@ class YahooNewsTokenizer:
 class NewsCrawlerPipeline(object):
 
     def process_item(self, item, spider):
-        manuscript = item['manuscript']
-        tokenizer = YahooNewsTokenizer()
+        original_news_items = item['original_news_items']
+        manuscript = original_news_items['manuscript']
+        tokenizer = YahooNewsTokenizer(spider.settings['MECAB_DICTIONARY'])
         sanitized = tokenizer.sanitize(manuscript)
         tokens = tokenizer.tokenize(sanitized)
         token_items = TokenItems()
-        token_items['tokens'] = tokens
-        item.token_items = token_items
+        token_items['tokens'] = " ".join(tokens)
+        item['token_items'] = token_items
         return item

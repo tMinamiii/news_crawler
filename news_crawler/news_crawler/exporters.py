@@ -35,8 +35,8 @@ class FTPFeedStorage(feedexport.BlockingFeedStorage):
 
 
 class MySpiderSlot(object):
-    def __init__(self, 
-                 csv_file, csv_exporter, csv_storage, csv_uri
+    def __init__(self,
+                 csv_file, csv_exporter, csv_storage, csv_uri,
                  token_file, token_exporter, token_storage, token_uri):
         self.csv_file = csv_file
         self.csv_exporter = csv_exporter
@@ -49,9 +49,11 @@ class MySpiderSlot(object):
         self.itemcount = 0
         self.exporting = False
 
+
 def store_all_slots(slots):
     for _, slot in slots.items():
-        slot.storage.store(slot.file)
+        slot.csv_storage.store(slot.csv_file)
+        slot.token_storage.store(slot.token_file)
 
 
 class FeedExporter(feedexport.FeedExporter):
@@ -70,10 +72,12 @@ class FeedExporter(feedexport.FeedExporter):
             if not slot.itemcount and not self.store_empty:
                 return
             if slot.exporting:
-                slot.exporter.finish_exporting()
+                slot.csv_exporter.finish_exporting()
+                slot.token_exporter.finish_exporting()
                 slot.exporting = False
             total_itemcount += slot.itemcount
-            uri_list.add(slot.uri)
+            uri_list.add(slot.csv_uri)
+            uri_list.add(slot.token_uri)
         logfmt = "%s %%(format)s feed (%%(itemcount)d items) in: %%(uri)s"
         log_args = {'format': self.format,
                     'itemcount': total_itemcount,
@@ -87,51 +91,59 @@ class FeedExporter(feedexport.FeedExporter):
         return d
 
     def item_scraped(self, item, spider):
-        category = item.original_news_items['category']
+        category = item['original_news_items']['category']
         if category not in self.slot_cache:
             timestr = spider.starttime.strftime('%Y-%m-%d')
-            csv_uri = self.urifmt % {'ftpuser': self.settings.FTP_USER,
-                                     'ftppass': self.settgins.FTP_PASS,
-                                     'ftpaddress': self.setting.FTP_ADDRESS,
-                                     'targetdir': self.setting.FTP_NEWS_DIR,
-                                     'category': category,
-                                     'starttime': timestr,
-                                     'format': self.settings.FEED_FORMAT}
-            token_uri = self.urifmt % {'ftpuser': self.settings.FTP_USER,
-                                       'ftppass': self.settgins.FTP_PASS,
-                                       'ftpaddress': self.setting.FTP_ADDRESS,
-                                       'targetdir': self.setting.FTP_TOKEN_DIR,
-                                       'category': category,
-                                     'starttime': timestr,
-                                     'format': self.settings.FEED_FORMAT}
-            
+            csv_uri = self.urifmt % {
+                'ftpuser': self.settings['FTP_USER'],
+                'ftppass': self.settings['FTP_PASS'],
+                'ftpaddress': self.settings['FTP_ADDRESS'],
+                'targetdir': self.settings['FTP_NEWS_DIR'],
+                'category': category,
+                'starttime': timestr,
+                'format': self.settings['FEED_FORMAT']
+            }
+            token_uri = self.urifmt % {
+                'ftpuser': self.settings['FTP_USER'],
+                'ftppass': self.settings['FTP_PASS'],
+                'ftpaddress': self.settings['FTP_ADDRESS'],
+                'targetdir': self.settings['FTP_TOKEN_DIR'],
+                'category': category,
+                'starttime': timestr,
+                'format': self.settings['TOKEN_FEED_FORMAT']
+            }
+
             csv_storage = self._get_storage(csv_uri)
             token_storage = self._get_storage(token_uri)
             csv_file = csv_storage.open(spider)
             token_file = token_storage.open(spider)
 
-            csv_exporter = self._get_exporter(csv_file,
-                                          fields_to_export=self.export_fields,
-                                          encoding=self.export_encoding,
-                                          indent=self.indent)
-            token_exporter = self._get_exporter(token_file,
-                                          fields_to_export=self.export_fields,
-                                          encoding=self.export_encoding,
-                                          indent=self.indent)
+            csv_exporter = self._get_exporter(
+                csv_file,
+                fields_to_export=self.export_fields,
+                encoding=self.export_encoding,
+                indent=self.indent)
+            token_exporter = self._get_exporter(
+                token_file,
+                fields_to_export=None,
+                include_headers_line=False,
+                encoding=self.export_encoding,
+                indent=self.indent)
             self.slot_cache[category] = MySpiderSlot(
                 csv_file, csv_exporter, csv_storage, csv_uri,
                 token_file, token_exporter, token_storage, token_uri)
 
         slot = self.slot_cache[category]
         if self.store_empty:
-                exporter.start_exporting()
-                slot.exporting = True
+            csv_exporter.start_exporting()
+            token_exporter.start_exporting()
+            slot.exporting = True
 
         if not slot.exporting:
             slot.csv_exporter.start_exporting()
             slot.token_exporter.start_exporting()
             slot.exporting = True
-        slot.csv_exporter.export_item(item.original_news_items)
-        slot.token_exporter.export_item(item.token_items)
+        slot.csv_exporter.export_item(item['original_news_items'])
+        slot.token_exporter.export_item(item['token_items'])
         slot.itemcount += 1
         return item

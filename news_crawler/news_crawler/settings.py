@@ -23,9 +23,9 @@ DOWNLOAD_DELAY = 1
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'news_crawler.pipelines.NewsCrawlerPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'news_crawler.pipelines.NewsCrawlerPipeline': 300,
+}
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
@@ -38,11 +38,11 @@ LOG_LEVEL = 'INFO'
 FTP_ADDRESS = '172.16.27.200'
 FTP_USER = 'crawlerpy'
 FTP_PASS = 'crawlerpy'
-FTP_NEWS_DIR = '/Crawler/TEST/YahooNews'
-FTP_TOKEN_DIR = '/Cralwer/TEST/YahooNews/TokenFiles'
+FTP_NEWS_DIR = 'Crawler/YahooNews'
+FTP_TOKEN_DIR = 'Crawler/TokenFiles'
 
 
-FEED_URI = 'ftp://%(ftpuser)s:%(ftppass)s@%(ftpaddress)S/%(targetdir)s/%(category)s/%(category)s_%(starttime)s.%(format)s'
+FEED_URI = 'ftp://%(ftpuser)s:%(ftppass)s@%(ftpaddress)s/%(targetdir)s/%(category)s/%(category)s_%(starttime)s.%(format)s'
 
 EXTENSIONS_BASE = {
     'scrapy.extensions.corestats.CoreStats': 0,
@@ -71,8 +71,9 @@ FEED_STORAGES_BASE = {
 
 ###### ORIGINAL SETTING #####
 
-MECAB_DICTIONARY = ' -d ~/dic/mecab-ipadci-neologd'
-# NEWS_MAJOR_ITEMS = None # NoneならAll
+MECAB_DICTIONARY = ' -d /usr/lib/mecab/dic/mecab-ipadic-neologd'
+NEWS_MAJOR_ITEMS = None # Noneなら全ニュース
 # NEWS_MAJOR_ITEMS = ['国内', '国際', '経済', 'エンタメ', 'スポーツ', 'IT・科学', 'ライフ', '地域']
 
-NEWS_MAJOR_ITEMS = ['地域']
+# NEWS_MAJOR_ITEMS = ['地域']
+

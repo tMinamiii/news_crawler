@@ -26,8 +26,8 @@ class YahooNewsSpider(scrapy.Spider):
         for mi, con in zip(major_items, containers):
             major_item = mi.css('::text').extract_first()
             links = con.css('ul.ymuiList > li.ymuiArrow > dl')
-            if self.settings.NEWS_MAJOR_ITEMS is not None:
-                if major_item not in self.settings.NEWS_MAJOR_ITEMS:
+            if self.settings['NEWS_MAJOR_ITEMS'] is not None:
+                if major_item not in self.settings['NEWS_MAJOR_ITEMS']:
                     continue
             for link in links:
                 # name = link.css('dt::text').extract_first()
@@ -78,7 +78,7 @@ class YahooNewsSpider(scrapy.Spider):
         original_news_items['category'] = response.meta.get('category')
         original_news_items['title'] = response.meta.get('title')
         items = AllNewsItems()
-        items.original_news_items = original_news_items
+        items['original_news_items'] = original_news_items
         yield items
 
     def is_old_news(self, pubdate_str: str, specified_date: datetime) -> bool:
