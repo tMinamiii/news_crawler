@@ -35,14 +35,19 @@ class FTPFeedStorage(feedexport.BlockingFeedStorage):
 
 
 class MySpiderSlot(object):
-    def __init__(self, file, exporter, storage, uri, exporting):
-        self.file = file
-        self.exporter = exporter
-        self.storage = storage
-        self.uri = uri
+    def __init__(self, 
+                 csv_file, csv_exporter, csv_storage, csv_uri
+                 token_file, token_exporter, token_storage, token_uri):
+        self.csv_file = csv_file
+        self.csv_exporter = csv_exporter
+        self.csv_storage = csv_storage
+        self.csv_uri = csv_uri
+        self.token_file = token_file
+        self.token_exporter = token_exporter
+        self.token_storage = token_storage
+        self.token_uri = token_uri
         self.itemcount = 0
-        self.exporting = exporting
-
+        self.exporting = False
 
 def store_all_slots(slots):
     for _, slot in slots.items():
@@ -82,20 +87,40 @@ class FeedExporter(feedexport.FeedExporter):
         return d
 
     def item_scraped(self, item, spider):
-        category = item['category']
+        category = item.original_news_items['category']
         if category not in self.slot_cache:
             timestr = spider.starttime.strftime('%Y-%m-%d')
-            uri = self.urifmt % {'category': category,
-                                 'starttime': timestr}
+            csv_uri = self.urifmt % {'ftpuser': self.settings.FTP_USER,
+                                     'ftppass': self.settgins.FTP_PASS,
+                                     'ftpaddress': self.setting.FTP_ADDRESS,
+                                     'targetdir': self.setting.FTP_NEWS_DIR,
+                                     'category': category,
+                                     'starttime': timestr,
+                                     'format': self.settings.FEED_FORMAT}
+            token_uri = self.urifmt % {'ftpuser': self.settings.FTP_USER,
+                                       'ftppass': self.settgins.FTP_PASS,
+                                       'ftpaddress': self.setting.FTP_ADDRESS,
+                                       'targetdir': self.setting.FTP_TOKEN_DIR,
+                                       'category': category,
+                                     'starttime': timestr,
+                                     'format': self.settings.FEED_FORMAT}
+            
+            csv_storage = self._get_storage(csv_uri)
+            token_storage = self._get_storage(token_uri)
+            csv_file = csv_storage.open(spider)
+            token_file = token_storage.open(spider)
 
-            storage = self._get_storage(uri)
-            file = storage.open(spider)
-            exporter = self._get_exporter(file,
+            csv_exporter = self._get_exporter(csv_file,
+                                          fields_to_export=self.export_fields,
+                                          encoding=self.export_encoding,
+                                          indent=self.indent)
+            token_exporter = self._get_exporter(token_file,
                                           fields_to_export=self.export_fields,
                                           encoding=self.export_encoding,
                                           indent=self.indent)
             self.slot_cache[category] = MySpiderSlot(
-                file, exporter, storage, uri, False)
+                csv_file, csv_exporter, csv_storage, csv_uri,
+                token_file, token_exporter, token_storage, token_uri)
 
         slot = self.slot_cache[category]
         if self.store_empty:
@@ -103,8 +128,10 @@ class FeedExporter(feedexport.FeedExporter):
                 slot.exporting = True
 
         if not slot.exporting:
-            slot.exporter.start_exporting()
+            slot.csv_exporter.start_exporting()
+            slot.token_exporter.start_exporting()
             slot.exporting = True
-        slot.exporter.export_item(item)
+        slot.csv_exporter.export_item(item.original_news_items)
+        slot.token_exporter.export_item(item.token_items)
         slot.itemcount += 1
         return item

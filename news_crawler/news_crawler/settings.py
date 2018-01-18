@@ -23,7 +23,7 @@ DOWNLOAD_DELAY = 1
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+# ITEM_PIPELINES = {
 #    'news_crawler.pipelines.NewsCrawlerPipeline': 300,
 #}
 
@@ -35,7 +35,14 @@ HTTPCACHE_EXPIRATION_SECS = 7200
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 LOG_LEVEL = 'INFO'
-FEED_URI = 'ftp://crawlerpy:crawlerpy@172.16.27.200/Crawler/YahooNews/%(category)s/%(category)s_%(starttime)s.csv'
+FTP_ADDRESS = '172.16.27.200'
+FTP_USER = 'crawlerpy'
+FTP_PASS = 'crawlerpy'
+FTP_NEWS_DIR = '/Crawler/YahooNews'
+FTP_TOKEN_DIR = '/Cralwer/YahooNews/TokenFiles'
+
+
+FEED_URI = 'ftp://%(ftpuser)s:%(ftppass)s@%(ftpaddress)S/%(targetdir)s/%(category)s/%(category)s_%(starttime)s.%(format)s'
 
 EXTENSIONS_BASE = {
     'scrapy.extensions.corestats.CoreStats': 0,
@@ -50,7 +57,8 @@ EXTENSIONS_BASE = {
 }
 
 FEED_FORMAT = 'csv'
-FEED_EXPORT_ENCODING = 'utf-8' 
+TOKEN_FEED_FORMAT = 'txt'
+FEED_EXPORT_ENCODING = 'utf-8'
 FEED_EXPORT_FIELDS = ['category', 'title', 'manuscript_len', 'manuscript']
 FEED_STORAGES_BASE = {
     '': 'scrapy.extensions.feedexport.FileFeedStorage',
@@ -59,4 +67,9 @@ FEED_STORAGES_BASE = {
     's3': 'scrapy.extensions.feedexport.S3FeedStorage',
     'ftp': 'news_crawler.exporters.FTPFeedStorage',
 }
+
+
+###### ORIGINAL SETTING #####
+
+MECAB_DICTIONARY = ' -d ~/dic/mecab-ipadci-neologd'
 

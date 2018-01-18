@@ -8,7 +8,16 @@
 import scrapy
 
 
-class NewsCrawlerItem(scrapy.Item):
+class AllNewsItems(scrapy.Item):
+    token_items = None
+    original_news_items = None
+
+
+class TokenItem(scrapy.Item):
+    tokens = scrapy.Field()
+
+
+class OriginalNewsItems(scrapy.Item):
     category = scrapy.Field()
     title = scrapy.Field()
     manuscript_len = scrapy.Field()

@@ -3,7 +3,8 @@ import logging
 
 import scrapy
 
-from news_crawler.items import NewsCrawlerItem
+from news_crawler.items import OriginalNewsItems
+from news_crawler.items import AllNewsItems
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +70,14 @@ class YahooNewsSpider(scrapy.Spider):
         if self.oneline:
             manuscript = manuscript.replace('\r', '')
             manuscript = manuscript.replace('\n', '')
-        item = NewsCrawlerItem()
-        item['manuscript'] = manuscript
-        item['manuscript_len'] = len(manuscript)
-        item['category'] = response.meta.get('category')
-        item['title'] = response.meta.get('title')
-        yield item
+        original_news_items = OriginalNewsItems()
+        original_news_items['manuscript'] = manuscript
+        original_news_items['manuscript_len'] = len(manuscript)
+        original_news_items['category'] = response.meta.get('category')
+        original_news_items['title'] = response.meta.get('title')
+        items = AllNewsItems()
+        items.original_news_items = original_news_items
+        yield items
 
     def is_old_news(self, pubdate_str: str, specified_date: datetime) -> bool:
         if specified_date is None:
