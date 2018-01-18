@@ -38,8 +38,8 @@ LOG_LEVEL = 'INFO'
 FTP_ADDRESS = '172.16.27.200'
 FTP_USER = 'crawlerpy'
 FTP_PASS = 'crawlerpy'
-FTP_NEWS_DIR = '/Crawler/YahooNews'
-FTP_TOKEN_DIR = '/Cralwer/YahooNews/TokenFiles'
+FTP_NEWS_DIR = '/Crawler/TEST/YahooNews'
+FTP_TOKEN_DIR = '/Cralwer/TEST/YahooNews/TokenFiles'
 
 
 FEED_URI = 'ftp://%(ftpuser)s:%(ftppass)s@%(ftpaddress)S/%(targetdir)s/%(category)s/%(category)s_%(starttime)s.%(format)s'
@@ -72,4 +72,7 @@ FEED_STORAGES_BASE = {
 ###### ORIGINAL SETTING #####
 
 MECAB_DICTIONARY = ' -d ~/dic/mecab-ipadci-neologd'
+# NEWS_MAJOR_ITEMS = None # NoneならAll
+# NEWS_MAJOR_ITEMS = ['国内', '国際', '経済', 'エンタメ', 'スポーツ', 'IT・科学', 'ライフ', '地域']
 
+NEWS_MAJOR_ITEMS = ['地域']

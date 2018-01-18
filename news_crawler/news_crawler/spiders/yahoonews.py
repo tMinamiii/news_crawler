@@ -2,7 +2,6 @@ import datetime
 import logging
 
 import scrapy
-
 from news_crawler.items import OriginalNewsItems
 from news_crawler.items import AllNewsItems
 
@@ -21,12 +20,15 @@ class YahooNewsSpider(scrapy.Spider):
         news_areas = response.css('div.rss_listbox')
         for area in news_areas:
             if area.css('h3[id=news]'):
-                titles = area.css('div.ymuiHeaderBGLight > h4.ymuiTitle')
+                major_items = area.css('div.ymuiHeaderBGLight > h4.ymuiTitle')
                 containers = area.css('div.ymuiContainer')
                 break
-        for t_ml, con in zip(titles, containers):
-            # title = t_ml.css('::text').extract_first()
+        for mi, con in zip(major_items, containers):
+            major_item = mi.css('::text').extract_first()
             links = con.css('ul.ymuiList > li.ymuiArrow > dl')
+            if self.settings.NEWS_MAJOR_ITEMS is not None:
+                if major_item not in self.settings.NEWS_MAJOR_ITEMS:
+                    continue
             for link in links:
                 # name = link.css('dt::text').extract_first()
                 url = link.css('dd > a::attr(href)').extract_first()
