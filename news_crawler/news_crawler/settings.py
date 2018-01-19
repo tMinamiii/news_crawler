@@ -57,7 +57,7 @@ EXTENSIONS_BASE = {
 }
 
 FEED_FORMAT = 'csv'
-TOKEN_FEED_FORMAT = 'txt'
+TOKEN_FEED_FORMAT = 'token'
 FEED_EXPORT_ENCODING = 'utf-8'
 FEED_EXPORT_FIELDS = ['category', 'title', 'manuscript_len', 'manuscript']
 FEED_STORAGES_BASE = {
